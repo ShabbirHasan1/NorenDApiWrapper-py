@@ -61,6 +61,7 @@ class NorenApi:
           'scripinfo': '/GetSecurityInfo',
           'getquotes': '/GetQuotes',
           'getclients': '/GetClients',
+          'limits' : '/Limits',
       },
       'websocket_endpoint': 'wss://wsendpoint/',
       'eoddata_endpoint' : 'http://eodhost/'
@@ -347,6 +348,38 @@ class NorenApi:
 
         return resDict
 
+    def get_limits(self, product_type = None, segment = None, exchange = None):
+        
+        config = NorenApi.__service_config
+
+        #prepare the uri
+        url = f"{config['host']}{config['routes']['limits']}" 
+        reportmsg(url)        
+        
+        values              = {}
+        values["uid"]       = self.__username
+        values["actid"]     = self.__accountid
+        
+        if product_type != None:
+            values["prd"]       = product_type       
+        
+        if product_type != None:
+            values["seg"]       = segment       
+        
+        if exchange != None:
+            values["exch"]       = exchange       
+        
+        #payload = 'jData=' + json.dumps(values) + f'&jKey={self.__susertoken}'
+        payload = 'jData=' + json.dumps(values)
+        
+        reportmsg(payload)
+
+        res = requests.post(url, data=payload, headers=self.__OAuthHeaders)
+        reportmsg(res.text)
+
+        resDict = json.loads(res.text)        
+
+        return resDict
     def place_order(self, act_id, buy_or_sell, product_type,
                     exchange, tradingsymbol, quantity, discloseqty,
                     price_type, price=0.0, trigger_price=None,
